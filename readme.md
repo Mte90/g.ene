@@ -40,6 +40,7 @@ I have not the knowledge to make that focused build.
 
 Require a linux amd64 system and python (for the web server)!  
 Execute `launch.sh` at first run will download the last Graphene build and [Browser.Html](https://github.com/browserhtml/browser.html).  
+There is a bug for run [Browser.html on Linux](https://github.com/browserhtml/browser.html/issues/871).
 
 `launch.sh` will launch graphene with the Test page (and JS Console opened).  
 `launch.sh true` will launch Graphene with Browser.html.  
