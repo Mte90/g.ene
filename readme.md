@@ -21,15 +21,17 @@ The 1.0 release have to goal to create a working alternative to Electron/nw.js
 
 * Generate automatically the manifest.webapp file of Open Web App
 * Bower support
-* Ultralight system ()
+* Ultralight system
 
 ##How to install
 
-Require a linux amd64 system!  
+Require a linux amd64 system and python (for the web server)!  
 Execute `launch.sh` that at first run will download the last graphene build and [Browser.Html](https://github.com/browserhtml/browser.html).  
 
 `launch.sh` will launch graphene with the Firefox OS Boilerplate.  
-`launch.sh true` will launch Graphene with Browser.html.
+`launch.sh true` will launch Graphene with Browser.html.  
+
+Remember the F5 key refresh the page on graphene, useful for testing.
 
 ##Benchmark
 

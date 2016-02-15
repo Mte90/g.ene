@@ -17,9 +17,9 @@ fi
 
 if [ -z $browser ]; then
     #Kill the script that run on the port 3000
-    fuser -k -n tcp 6060 &>/dev/null && \
+    ( fuser -k 6060/tcp &>/dev/null ) && \
     #Run a webserver
-    ( cd ./test && python -m SimpleHTTPServer 3000 &>/dev/null ) 
+    ( cd ./test && python -m SimpleHTTPServer 6060 &>/dev/null ) 
 else
     npm start
 fi
