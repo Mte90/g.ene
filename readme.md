@@ -10,6 +10,23 @@ Actually the [Graphene build](https://archive.mozilla.org/pub/b2g/nightly/latest
 ##What is this project?
 This project is an experimental to get an alternative to Electron/NW.js that are based on Webkit.  
 
+##API Supported
+The API supported from this builds are different from Firefox OS and Firefox desktop and require the [permission](https://developer.mozilla.org/en-US/Apps/Build/App_permissions) from the manifest.webapp (actually the app is `privileged`).  
+Actually the test page confirm:  
+* Service Worker not supported
+* Notification supported
+* Geolocation supported
+* Battery supported
+* getUserMedia supported
+* SpeechRecognition supported
+* Pointer Lock not supported
+* Open Web App supported
+* Bluetooth not supported
+* FxOS TCP Socket not supported
+* FxOS Push not supported
+* FxOS DeviceStorage supported
+* FxOS MozActivity supported
+
 ###Experimental release goal
 * Create a page that show the HTML5 api supported like (html5test.com) with the Firefox OS Apis
 * Improve the script
