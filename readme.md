@@ -3,7 +3,8 @@
  
 ##What?
 
-Graphene is a Boot2Gecko version for desktop that use the same technology of Firefox OS but in the desktop.
+Graphene is a Boot2Gecko version for desktop that use the same technology of Firefox OS but in the desktop.  
+In few words is a Firefox with the UI and with the Firefox OS APIs.
 
 Actually the [Graphene build](https://archive.mozilla.org/pub/b2g/nightly/latest-mozilla-central/) exist only for Linux, check on [1218589](https://bugzilla.mozilla.org/show_bug.cgi?id=1218589).
 
