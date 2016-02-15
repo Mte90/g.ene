@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
   }
 
   if (navigator.mozGetUserMedia) {
-    append_div('getUserMedia supported');
+    append_div('getUserMedia supported, on Graphene not work [Security Error]');
   } else {
     append_div('getUserMedia <b>not</b> supported');
     document.querySelector('.getUserMedia').style.display = 'none';

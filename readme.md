@@ -4,21 +4,22 @@
 ##What?
 
 Graphene is a Boot2Gecko version for desktop that use the same technology of Firefox OS but in the desktop.  
-In few words is a Firefox with the UI and with the Firefox OS APIs.
+In few words is a Firefox without the UI and with the Firefox OS APIs.  
+The big problem is the real support of HTML5 APIs and Firefox OS APIs.
 
 Actually the [Graphene build](https://archive.mozilla.org/pub/b2g/nightly/latest-mozilla-central/) exist only for Linux, check on [1218589](https://bugzilla.mozilla.org/show_bug.cgi?id=1218589).
 
 ##What is this project?
-This project is an experimental to get an alternative to Electron/NW.js that are based on Webkit.  
+This project is an experiment to get an alternative to Electron/NW.js (that are based on Webkit).  
 
 ##API Supported
 The API supported from this builds are different from Firefox OS and Firefox desktop and require the [permission](https://developer.mozilla.org/en-US/Apps/Build/App_permissions) from the manifest.webapp (actually the app is `privileged`).  
 Actually the test page confirm:  
 * Service Worker not supported
-* Notification supported
-* Geolocation supported
+* Notification supported, on Graphene not work
+* Geolocation supported, on Graphene not work
 * Battery supported
-* getUserMedia supported
+* getUserMedia supported, on Graphene not work [Security Error]
 * SpeechRecognition supported
 * Pointer Lock not supported
 * Open Web App supported
