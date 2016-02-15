@@ -1,0 +1,610 @@
+/* global MozActivity, alert, console, Notification */
+"use strict";
+(function () {
+    /*
+        WebActivities:
+
+            configure
+            costcontrol/balance
+            costcontrol/data_usage
+            costcontrol/telephony
+            dial
+            new (type: "websms/sms", "webcontacts/contact") (add-contact, compose-mail?)
+            open
+            pick (type: "image/png" etc)
+            record (capture?)
+            save-bookmark
+            share
+            test
+            view (type: "url" etc. "text/html"?)
+    */
+
+    // WebActivities
+    var pickImage = document.querySelector("#pick-image");
+    if (pickImage) {
+        pickImage.onclick = function () {
+            var pick = new MozActivity({
+                name: "pick",
+                data: {
+                    type: ["image/png", "image/jpg", "image/jpeg"],
+                    // In FxOS 1.3 and before the user is allowed to crop the
+                    // image by default, but this can cause out-of-memory issues
+                    // so we explicitly disable it.
+                    nocrop: true // don't allow the user to crop the image
+                }
+            });
+
+            pick.onsuccess = function () {
+                var img = document.createElement("img");
+                img.src = window.URL.createObjectURL(this.result.blob);
+                var imagePresenter = document.querySelector("#image-presenter");
+                imagePresenter.appendChild(img);
+                imagePresenter.style.display = "block";
+            };
+
+            pick.onerror = function () {
+                console.log("Can't view the image");
+            };
+        };
+    }
+
+    var pickAnything = document.querySelector("#pick-anything");
+    if (pickAnything) {
+        pickAnything.onclick = function () {
+             var pickAny = new MozActivity({
+                 name: "pick"
+             });
+
+            pickAny.onsuccess = function () {
+                var img = document.createElement("img");
+                if (this.result.blob.type.indexOf("image") != -1) {
+                    img.src = window.URL.createObjectURL(this.result.blob);
+                    var imagePresenter = document.querySelector("#image-presenter");
+                    imagePresenter.appendChild(img);
+                    imagePresenter.style.display = "block";
+                }
+            };
+
+            pickAny.onerror = function () {
+                console.log("An error occurred");
+            };
+        };
+    }
+
+    var record = document.querySelector("#record");
+    if (record) {
+        record.onclick = function () {
+            var rec = new MozActivity({
+                name: "record" // Possibly capture in future versions
+            });
+
+            rec.onsuccess = function () {
+                var img = document.createElement("img");
+                img.src = window.URL.createObjectURL(this.result.blob);
+                var imagePresenter = document.querySelector("#image-presenter");
+                imagePresenter.appendChild(img);
+                imagePresenter.style.display = "block";
+            };
+
+            rec.onerror = function () {
+                alert("No taken picture returned");
+            };
+        };
+    }
+
+    var dial = document.querySelector("#dial");
+    if (dial) {
+        dial.onclick = function () {
+            new MozActivity({
+                name: "dial",
+                data: {
+                    number: "+46777888999"
+                }
+            });
+        };
+    }
+
+    var sendSMS = document.querySelector("#send-sms");
+    if (sendSMS) {
+        sendSMS.onclick = function () {
+            new MozActivity({
+                name: "new", // Possible compose-sms in future versions
+                data: {
+                    type: "websms/sms",
+                    number: "+46777888999"
+                }
+            });
+        };
+    }
+
+    var addContact = document.querySelector("#add-contact");
+    if (addContact) {
+        addContact.onclick = function () {
+            new MozActivity({
+                name: "new", // Possibly add-contact in future versions
+                data: {
+                    type: "webcontacts/contact",
+                    params: { // Will possibly move to be direct properties under "data"
+                        givenName: "Robert",
+                        lastName: "Nyman",
+                        tel: "+44789",
+                        email: "robert@mozilla.com",
+                        address: "San Francisco",
+                        note: "This is a note",
+                        company: "Mozilla"
+                    }
+                }
+            });
+        };
+    }
+
+    var share = document.querySelector("#share");
+    if (share) {
+        share.onclick = function () {
+            new MozActivity({
+                name: "share",
+                data: {
+                    //type: "url", // Possibly text/html in future versions,
+                    number: 1,
+                    url: "http://robertnyman.com"
+                }
+            });
+        };
+    }
+
+    var shareImage = document.querySelector("#share-image"),
+        imgToShare = document.querySelector("#image-to-share");
+    if (shareImage && imgToShare) {
+        shareImage.onclick = function () {
+            if(imgToShare.naturalWidth > 0) {
+                // Create dummy canvas
+                var blobCanvas = document.createElement("canvas");
+                blobCanvas.width = imgToShare.width;
+                blobCanvas.height = imgToShare.height;
+
+                // Get context and draw image
+                var blobCanvasContext = blobCanvas.getContext("2d");
+                blobCanvasContext.drawImage(imgToShare, 0, 0);
+
+                // Export to blob and share through a Web Activitiy
+                blobCanvas.toBlob(function (blob) {
+                    new MozActivity({
+                        name: "share",
+                        data: {
+                            type: "image/*",
+                            number: 1,
+                            blobs: [blob]
+                        }
+                    });
+                });
+            }
+            else {
+                alert("Image failed to load, can't be shared");
+            }
+        };
+    }
+
+    var viewURL = document.querySelector("#view-url");
+    if (viewURL) {
+        viewURL.onclick = function () {
+            new MozActivity({
+                name: "view",
+                data: {
+                    type: "url", // Possibly text/html in future versions
+                    url: "http://robertnyman.com"
+                }
+            });
+        };
+    }
+
+    var composeEmail = document.querySelector("#compose-email");
+    if (composeEmail) {
+        composeEmail.onclick = function () {
+            new MozActivity({
+                name: "new", // Possibly compose-mail in future versions
+                data: {
+                    type : "mail",
+                    url: "mailto:example@example.org"
+                }
+            });
+        };
+    }
+
+    var saveBookmark = document.querySelector("#save-bookmark");
+    if (saveBookmark) {
+        saveBookmark.onclick = function () {
+            new MozActivity({
+                name: "save-bookmark",
+                data: {
+                    type: "url",
+                    url: "http://robertnyman.com",
+                    name: "Robert's talk",
+                    icon: "http://robertnyman.com/favicon.png"
+                }
+            });
+        };
+    }
+
+    var openVideo = document.querySelector("#open-video");
+    if (openVideo) {
+        openVideo.onclick = function () {
+            new MozActivity({
+                name: "open",
+                data: {
+                    type: [
+                      "video/webm",
+                      "video/mp4",
+                      "video/3gpp",
+                      "video/youtube"
+                    ],
+                    url: "http://v2v.cc/~j/theora_testsuite/320x240.ogg"
+                }
+            });
+        };
+    }
+
+    var openSettings = document.querySelector("#open-settings");
+    if (openSettings) {
+        openSettings.onclick = function () {
+            new MozActivity({
+                name: "configure",
+                target: "device"
+            });
+        };
+    }
+
+
+
+    // Notifications
+    var addNotification = document.querySelector("#add-notification");
+    if (addNotification) {
+        addNotification.onclick = function () {
+            if ("Notification" in window) {
+                // Firefox OS 1.1 and higher
+                if (Notification.permission !== "denied") {
+                    Notification.requestPermission(function (permission) {
+                        if(!("permission" in Notification)) {
+                            Notification.permission = permission;
+                        }
+                    });
+                }
+
+                if (Notification.permission === "granted") {
+                    new Notification("See this", {
+                        body : "This is a notification"
+                    });
+                }
+            }
+            else {
+                // Firefox OS 1.0
+                var notify = navigator.mozNotification.createNotification(
+                    "See this",
+                    "This is a notification"
+                );
+                notify.show();
+            }
+        };
+    }
+
+    // Lock orientation
+    var lockOrientation = document.querySelector("#lock-orientation");
+    if (lockOrientation) {
+        lockOrientation.onclick = function () {
+            /*
+                Possible values:
+                    "landscape",
+                    "portrait"
+                    "landscape-primary"
+                    "landscape-secondary"
+                    "portrait-primary"
+                    "portrait-secondary"
+            */
+            var portraitLock = screen.mozLockOrientation("portrait");
+            if (portraitLock) {
+                alert("Orientation locked to portrait");
+            }
+        };
+    }
+
+    // Vibration
+    var vibrate = document.querySelector("#vibrate");
+    if (vibrate) {
+        vibrate.onclick = function () {
+            navigator.vibrate(2000);
+            /*
+                Possible values:
+                On/off pattern:
+                navigator.vibrate([200, 100, 200, 100]);
+
+                Turn off vibration
+                navigator.vibrate(0);
+            */
+        };
+    }
+
+    // Check connection
+    var checkConnection = document.querySelector("#check-connection"),
+        connectionDisplay = document.querySelector("#connection-display");
+
+    if (checkConnection && connectionDisplay) {
+        checkConnection.onclick = function () {
+            var connection = window.navigator.mozConnection,
+                online = "<strong>Connected:</strong> " + (connection.bandwidth),
+                metered = "<strong>Metered:</strong> " + connection.metered;
+
+            connectionDisplay.innerHTML = "<h4>Result from Check connection</h4>" + online + "<br>" + metered;
+            connectionDisplay.style.display = "block";
+        };
+    }
+
+    // Check battery
+    var checkBattery = document.querySelector("#check-battery"),
+        batteryDisplay = document.querySelector("#battery-display");
+    if (checkBattery && batteryDisplay) {
+        checkBattery.onclick = function () {
+            var battery = navigator.battery,
+                batteryLevel = Math.round(battery.level * 100) + "%",
+                charging = battery.charging,
+                chargingTime = parseInt(battery.chargingTime / 60, 10),
+                dischargingTime = parseInt(battery.dischargingTime / 60, 10),
+                batteryInfo;
+
+            batteryInfo = "<h4>Result from Check battery</h4><strong>Battery level:</strong> " + batteryLevel + "<br>";
+            batteryInfo += "<strong>Battery charging:</strong> " + charging + "<br>";
+            batteryInfo += "<strong>Battery charging time:</strong> " + chargingTime + "<br>";
+            batteryInfo += "<strong>Battery discharging time:</strong> " + dischargingTime;
+
+            batteryDisplay.innerHTML = batteryInfo;
+            batteryDisplay.style.display = "block";
+        };
+    }
+
+    // Geolocation
+    var geolocation = document.querySelector("#geolocation"),
+        geolocationDisplay = document.querySelector("#geolocation-display");
+    if (geolocation && geolocationDisplay) {
+        geolocation.onclick = function () {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                geolocationDisplay.innerHTML = "<strong>Latitude:</strong> " + position.coords.latitude + ", <strong>Longitude:</strong> " + position.coords.longitude;
+                geolocationDisplay.style.display = "block";
+            },
+            function () {
+                geolocationDisplay.innerHTML = "Failed to get your current location";
+                geolocationDisplay.style.display = "block";
+            });
+        };
+    }
+
+    // Ambient light
+    var ambientLight = document.querySelector("#ambient-light"),
+        ambientLightDisplay = document.querySelector("#ambient-light-display");
+    if (ambientLight && ambientLightDisplay) {
+        ambientLight.onclick = function () {
+            ambientLightDisplay.style.display = "block";
+            window.ondevicelight = function (event) {
+                // Read out the lux value
+                var lux = "<strong>Ambient light: </strong>" + event.value + " lux";
+                ambientLightDisplay.innerHTML = lux;
+            };
+        };
+    }
+
+    // Proximity
+    var proximity = document.querySelector("#proximity"),
+        proximityDisplay = document.querySelector("#proximity-display");
+    if (proximity && proximityDisplay) {
+        proximity.onclick = function () {
+            proximityDisplay.style.display = "block";
+            window.ondeviceproximity = function (event) {
+                // Check proximity, in centimeters
+                var prox = "<strong>Proximity: </strong>" + event.value + " cm<br>";
+                prox += "<strong>Min value supported: </strong>" + event.min + " cm<br>";
+                prox += "<strong>Max value supported: </strong>" + event.max + " cm";
+                proximityDisplay.innerHTML = prox;
+            };
+        };
+    }
+
+    // User proximity
+    var userProximity = document.querySelector("#user-proximity"),
+        userProximityDisplay = document.querySelector("#user-proximity-display");
+    if (userProximity && userProximityDisplay) {
+        userProximity.onclick = function () {
+            userProximityDisplay.style.display = "block";
+            window.onuserproximity = function (event) {
+                // Check user proximity
+                var userProx = "<strong>User proximity - near: </strong>" + event.near + "<br>";
+                userProximityDisplay.innerHTML = userProx;
+            };
+        };
+    }
+
+    // Device Orientation
+    var deviceOrientation = document.querySelector("#device-orientation"),
+        deviceOrientationDisplay = document.querySelector("#device-orientation-display");
+
+    if (deviceOrientation && deviceOrientationDisplay) {
+        deviceOrientation.onclick = function() {
+            deviceOrientationDisplay.style.display = "block";
+            window.ondeviceorientation = function (event) {
+                var orientedTo = (event.beta > 45 && event.beta < 135) ? "top" : (event.beta < -45 && event.beta > -135) ? "bottom" : (event.gamma > 45) ? "right" : (event.gamma < -45) ? "left" : "flat";
+                var orientation = "<strong>Absolute: </strong>" + event.absolute + "<br>" +
+                                    "<strong>Alpha: </strong>" + event.alpha + "<br>" +
+                                    "<strong>Beta: </strong>" + event.beta + "<br>" +
+                                    "<strong>Gamma: </strong>" + event.gamma + "<br>" +
+                                    "<strong>Device orientation: </strong>" + orientedTo;
+
+                deviceOrientationDisplay.innerHTML = orientation;
+            };
+        };
+    }
+
+    // Log visibility of the app
+    var logVisibility = document.querySelector("#log-visibility"),
+        logVisibilityDisplay = document.querySelector("#log-visibility-display");
+    if (logVisibility && logVisibilityDisplay) {
+        logVisibility.onclick = function () {
+            logVisibilityDisplay.style.display = "block";
+            logVisibilityDisplay.innerHTML = "I have focus!<br>";
+            document.addEventListener("visibilitychange", function () {
+                if (document.hidden) {
+                    console.log("Firefox OS Boilerplate App is hidden");
+                    logVisibilityDisplay.innerHTML += "Now I'm in the background<br>";
+                }
+                else {
+                    console.log("Firefox OS Boilerplate App has focus");
+                    logVisibilityDisplay.innerHTML += "I have focus!<br>";
+                }
+            });
+        };
+    }
+
+    // Cross domain XHR
+    var crossDomainXHR = document.querySelector("#cross-domain-xhr"),
+        crossDomainXHRDisplay = document.querySelector("#cross-domain-xhr-display");
+    if (crossDomainXHR && crossDomainXHRDisplay) {
+        crossDomainXHR.onclick = function () {
+            var xhr = new XMLHttpRequest({mozSystem: true});
+            xhr.open("GET", "http://robnyman.github.io/Firefox-OS-Boilerplate-App/README.md", true);
+            xhr.onreadystatechange = function () {
+                if (xhr.status === 200 && xhr.readyState === 4) {
+                    crossDomainXHRDisplay.innerHTML = "<h4>Result from Cross-domain XHR</h4>" + xhr.response;
+                    crossDomainXHRDisplay.style.display = "block";
+                }
+            };
+
+            xhr.onerror = function () {
+                crossDomainXHRDisplay.innerHTML = "<h4>Result from Cross-domain XHR</h4><p>Cross-domain XHR failed</p>";
+                crossDomainXHRDisplay.style.display = "block";
+            };
+            xhr.send();
+        };
+    }
+
+    // deviceStorage, pictures
+    var deviceStoragePictures = document.querySelector("#device-storage-pictures"),
+        deviceStoragePicturesDisplay = document.querySelector("#device-storage-pictures-display");
+    if (deviceStoragePictures && deviceStoragePicturesDisplay) {
+        deviceStoragePictures.onclick = function () {
+            var deviceStorage = navigator.getDeviceStorage("pictures"),
+                cursor = deviceStorage.enumerate();
+            deviceStoragePicturesDisplay.innerHTML = "<h4>Result from deviceStorage - pictures</h4>";
+
+            cursor.onsuccess = function () {
+                if (!cursor.result) {
+                    deviceStoragePicturesDisplay.innerHTML = "No files";
+                }
+
+                var file = cursor.result,
+                    filePresentation;
+                filePresentation = "<strong>" + file.name + ":</strong> " + parseInt(file.size / 1024, 10) + "kb<br>";
+                filePresentation += "<p><img src='" + window.URL.createObjectURL(file) + "' alt=''></p>";
+                deviceStoragePicturesDisplay.innerHTML += filePresentation;
+
+                deviceStoragePicturesDisplay.style.display = "block";
+            };
+
+            cursor.onerror = function () {
+                console.log(this.error);
+                deviceStoragePicturesDisplay.innerHTML = "<h4>Result from deviceStorage - pictures</h4><p>deviceStorage failed</p><p>" + 
+						(this.error.message || this.error.name || this.error.toString()) + "</p>";
+                deviceStoragePicturesDisplay.style.display = "block";
+            };
+        };
+    }
+
+    // List contacts
+    var getAllContacts = document.querySelector("#get-all-contacts"),
+        getAllContactsDisplay = document.querySelector("#get-all-contacts-display");
+    if (getAllContacts && getAllContactsDisplay) {
+        getAllContacts.onclick = function () {
+            var getContacts = window.navigator.mozContacts.getAll({});
+            getAllContactsDisplay.style.display = "block";
+
+            getContacts.onsuccess = function () {
+                var result = getContacts.result;
+                if (result) {
+                    getAllContactsDisplay.innerHTML += result.givenName + " " + result.familyName + "<br>";
+                    getContacts.continue();
+                }
+            };
+
+            getContacts.onerror = function () {
+                getAllContactsDisplay.innerHTML += "Error";
+            };
+        };
+    }
+
+    // Keep screen on
+    var lock = null,
+        keepscreen = document.querySelector("#keep-screen-on");
+    if (keepscreen) {
+        keepscreen.onclick = function () {
+            if (!lock) {
+                lock = window.navigator.requestWakeLock("screen");
+                keepscreen.innerHTML = "Remove the lock";
+            }
+            else {
+                lock.unlock();
+                lock = null;
+                keepscreen.innerHTML = "Keep screen on";
+            }
+        };
+    }
+
+    // Alarm API
+    var alarmDate = new Date("Aug 31, 2014 15:20:00"),
+        addAlarm = document.querySelector("#add-alarm"),
+        alarmDisplay = document.querySelector("#alarm-display");
+    if (addAlarm) {
+        addAlarm.onclick = function () {
+            var alarm = navigator.mozAlarms.add(alarmDate, "honorTimezone", {
+                "optionalData" : "I am data"
+            });
+
+            alarm.onsuccess = function () {
+                alarmDisplay.innerHTML = "Alarm scheduled for " + alarmDate;
+            };
+
+            alarm.onerror = function () { 
+                alarmDisplay.innerHTML = "Failed to set the alarm<br>" + this.error.name;
+            };
+
+            var getAllAlarms = navigator.mozAlarms.getAll();
+            getAllAlarms.onsuccess = function () {
+                alarmDisplay.innerHTML += "<h4>All alarms</h4>";
+                this.result.forEach(function (alarm) {                    
+                    alarmDisplay.innerHTML += "<p><strong>Id:</strong> " + alarm.id + 
+                    ", <strong>date:</strong> " + alarm.date + 
+                    ", <strong>respectTimezone:</strong> " + alarm.respectTimezone + 
+                    ", <strong>data:</strong> " + JSON.stringify(alarm.data) + "</p>";
+                });
+            };
+
+            getAllAlarms.onerror = function () { 
+                alarmDisplay.innerHTML = "<p>Failed to get all alarms</p>" + this.error.name;
+            };
+        };
+    }
+
+    var removeAllAlarms = document.querySelector("#remove-all-alarms"),
+        removeAlarmsDisplay = document.querySelector("#remove-alarms-display");
+    if(removeAllAlarms) {
+        removeAllAlarms.onclick = function () {
+            var getAddedAlarms = navigator.mozAlarms.getAll();
+            getAddedAlarms.onsuccess = function () {
+                this.result.forEach(function (alarm) {
+                    navigator.mozAlarms.remove(alarm.id);
+                });
+                removeAlarmsDisplay.innerHTML = "All alarms removed";
+                if (alarmDisplay) {
+                    alarmDisplay.innerHTML = "";
+                }
+            };
+
+            getAddedAlarms.onerror = function () { 
+                removeAlarmsDisplay.innerHTML = "<p>Failed to remove all alarms</p>" + this.error.name;
+            };
+        };
+    }
+})();
