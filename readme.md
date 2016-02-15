@@ -9,9 +9,21 @@ Actually the [Graphene build](https://archive.mozilla.org/pub/b2g/nightly/latest
 
 ##What is this project?
 This project is an experimental to get an alternative to Electron/NW.js that are based on Webkit.  
-The actual roadmap is create a page that show the HTML5 api supported like (html5test.com) with the Firefox OS Apis.
 
-#How to install
+###Experimental release goal
+* Create a page that show the HTML5 api supported like (html5test.com) with the Firefox OS Apis
+* Improve the script
+* Benchmark
+* Comparison with Electron/nw.js
+
+###1.0 release goal
+The 1.0 release have to goal to create a working alternative to Electron/nw.js
+
+* Generate automatically the manifest.webapp file of Open Web App
+* Bower support
+* Ultralight system ()
+
+##How to install
 
 Require a linux amd64 system!  
 Execute `launch.sh` that at first run will download the last graphene build and [Browser.Html](https://github.com/browserhtml/browser.html).  
