@@ -27,6 +27,8 @@ Actually the test page confirm:
 * FxOS DeviceStorage supported
 * FxOS MozActivity supported
 
+PS: The default font is [Fira](https://github.com/mozilla/Fira)
+
 ###Experimental release goal
 * Create a page that show the HTML5 api supported like (html5test.com) with the Firefox OS Apis
 * Improve the script
